@@ -1,5 +1,5 @@
-import { Component } from "@angular/core";
-import { concat } from "rxjs";
+import { Component, OnInit } from "@angular/core";
+import { concat, Observable } from "rxjs";
 import { startWith } from "rxjs/operators";
 import { FirstDataRenderedEvent } from "ag-grid-community";
 
@@ -35,7 +35,8 @@ import { PostCollectionService } from "../post-collection.service";
     `
        ]
 })
-export class PostListComponent {
+export class PostListComponent implements OnInit {
+       rows$: Observable<any>
        private columnDefaults = {
               resizable: true,
               sortable: true,
@@ -61,14 +62,21 @@ export class PostListComponent {
               }
        ];
 
-       readonly rows$ = concat(
-              this.postCollectionService.getAll(),
-              this.postCollectionService.entities$
-       ).pipe(startWith(null));
+       // readonly rows$ = concat(
+       //        this.postCollectionService.getAll(),
+       //        this.postCollectionService.entities$
+       // ).pipe(startWith(null));
 
-       constructor(private postCollectionService: PostCollectionService) { }
+       constructor(private postCollectionService: PostCollectionService) {
+              this.postCollectionService.entities$
+       }
 
        onFirstDataRendered({ columnApi }: FirstDataRenderedEvent): void {
               columnApi.autoSizeAllColumns();
        }
+
+       ngOnInit() {
+              this.rows$ = this.postCollectionService.getAll()
+       }
+
 }
